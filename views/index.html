@@ -1,0 +1,308 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Discord bot Spotify authorization</title>
+
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro" rel="stylesheet">
+
+    <style>
+      @media only screen and (max-width: 600px) {
+        #wrapper {
+          width: 100% !important;
+          padding: 10px;
+        }
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        background: url('https://s3.eu-central-1.amazonaws.com/psykedelia/assets/background.jpg') no-repeat;
+        background-size: cover;
+        background-attachment: fixed;
+        font-family: 'Source Sans Pro', sans-serif;
+        font-size: 21px;
+      }
+
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+      }
+
+      a {
+        color: #d2d2d2;
+        text-decoration: none;
+      }
+
+      h1.error {
+        font-size: 1.6em !important;
+        color: #ff0033;
+      }
+
+      a.button {
+        background: rgba(0, 0, 0, 0.45);
+        padding: 20px 25px;
+        border-radius: 6px;
+        transition: all .2s ease-in-out;
+        display: inline-block;
+      }
+
+      a.button:hover {
+        background: rgba(0, 0, 0, 0.6);
+      }
+
+      #container {
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: #f2f2f2;
+      }
+
+      #wrapper {
+        width: 60%;
+        text-align: center;
+        filter: blur(0px);
+        z-index: 99;
+      }
+
+      #wrapper {
+        font-size: 1em;
+        display: none;
+      }
+
+      #wrapper h1 {
+        font-size: 2em;
+      }
+
+      #wrapper h1,
+      #wrapper p,
+      #form input,
+      #form .input-help,
+      #wrapper #revoke-error,
+      a {
+        text-shadow: 1px 1px 7px black;
+      }
+
+      #wrapper p:last-of-type {
+        margin-bottom: 35px;
+      }
+
+      #form input {
+        width: 80%;
+        font-size: 1.4em;
+        padding: 20px;
+        background: rgba(0, 0, 0, 0.2);
+        border: 1px solid #f2f2f2;
+        border-radius: 6px;
+        margin-bottom: 5px;
+      }
+
+      #form .input-help {
+        font-size: 0.8em;
+        font-weight: 200;
+        margin-bottom: 25px;
+        color: #f2f2f2;
+      }
+
+      #form input.error {
+        border: 1px solid #ff0000;
+        color: #ff0000;
+      }
+
+       #form input.error::placeholder {
+         color: #ff0000;
+       }
+
+      #form input,
+      #form input::placeholder,
+      #form button[type="submit"] {
+        color: #f2f2f2;
+        font-weight: 200;
+        text-align: center;
+      }
+
+      #form input::placeholder {
+        color: #c2c2c2;
+      }
+
+      #form button[type="submit"] {
+        width: 40%;
+        color: #f2f2f2;
+        background: rgba(0, 0, 0, 0.5);
+        border: none;
+        font-size: 1.5em;
+        padding: 12px;
+        border: 1px solid #f2f2f2;
+        border-radius: 6px;
+      }
+
+      #form button[disabled][type="submit"] {
+        color: #111111;
+        border: 1px solid #222222;
+      }
+
+      #wrapper #authorized {
+        display: none;
+      }
+
+      #wrapper #authorized p {
+        margin-bottom: 35px;
+      }
+
+      #wrapper #revoke-error {
+        font-size: 0.8em;
+        margin-top: 10px;
+        color: #ff0033;
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="container">
+      <div id="wrapper">
+        <h1>Discord bot Spotify authorization</h1>
+
+        <div id="not-authorized">
+          <p>To use Psykedelia bots now playing functionality, you need to authorize the bot to read your currently playing status from Spotify API. Bot cannot do any modifications or read anything else but your now playing artist and song.</p>
+
+          <p>Type your Discord username in the box below and click Continue. You will be redirected to Spotify authorization page where you're required to log in to authorize the bot.</p>
+
+          <div id="form">
+            <form id="send-username" method="post">
+              <input type="text" name="username" placeholder="Your Discord username">
+              <div class="input-help">For example foo#1234</div>
+              <button type="submit" disabled>Continue</button>
+            </form>
+          </div>
+        </div>
+        <div id="authorized">
+          <p>Congratulations! You are authorized with the bot.</p>
+
+          <a class="button" id="spotify-revoke" href="https://www.spotify.com/fi/account/apps/">
+            Revoke authorization here
+          </a>
+
+          <div id="revoke-error">Error while revoking your authorization</div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
+    <script>
+      $(function() {
+        var apiUrl = '{{ apiUrl }}';
+        var discordUsername = Cookies.get('discord_username');
+        var $wrapper = $('#wrapper');
+        var $revokeError = $wrapper.find('#revoke-error');
+
+        var sendAuthorization = function(username) {
+          return $.post(apiUrl, {
+            username: username
+          });
+        };
+
+        var deleteToken = function(username) {
+          return $.ajax({
+            url: apiUrl,
+            method: 'DELETE',
+            data: {
+              username: username
+            }
+          });
+        };
+
+        var validUsername = function(username) {
+          return username.match(/^([a-zA-Z0-9]+)\#([0-9]{4})$/) ? true : false;
+        };
+
+        $('#spotify-revoke').on('click', function(event) {
+          event.preventDefault();
+
+          $revokeError.fadeOut('fast');
+
+          deleteToken(Cookies.get('discord_username'))
+            .done(function() {
+              Cookies.remove('discord_username');
+
+              window.location = event.target.href;
+            })
+            .fail(function() {
+              $revokeError.fadeIn('fast');
+            });
+        });
+
+        if (typeof discordUsername !== 'undefined') {
+          return sendAuthorization(discordUsername)
+            .done(function(result) {
+              if (result.authorized === false) {
+                Cookies.remove('discord_username');
+
+                window.location = result.authorizationUri;
+
+                return;
+              }
+
+              Cookies.set('discord_username', discordUsername);
+
+              var $authorized = $wrapper.find('#authorized');
+              var $notAuthorized = $wrapper.find('#not-authorized');
+
+              $notAuthorized.hide();
+              $authorized.show();
+            })
+            .fail(function(error) {
+              $wrapper.html('<h1 class="error">Error while connecting to the authorization server<h1>');
+            })
+            .always(function() {
+              $wrapper.fadeIn(500);
+            });
+        }
+
+        $wrapper.fadeIn(500);
+
+        var $form = $('form#send-username');
+        var $input = $form.find('input[name="username"]');
+        var $submit = $form.find('button[type="submit"]');
+
+        $input.on('input', function() {
+          if (validUsername($input.val()) === false) {
+            $submit.prop('disabled', true);
+
+            return false;
+          }
+
+          $submit.prop('disabled', false);
+        });
+
+        $form.on('submit', function(event) {
+          event.preventDefault();
+
+          $submit.add($input).prop('disabled', true);
+
+          sendAuthorization($input.val())
+            .done(function(result) {
+              Cookies.set('discord_username', $input.val());
+
+              if (result.authorized === false) {
+                window.location = result.authorizationUri;
+
+                return;
+              }
+
+              location.reload();
+            }).always(function() {
+              $submit.add($input).prop('disabled', false);
+            });
+        });
+      });
+    </script>
+  </body>
+</html>

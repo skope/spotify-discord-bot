@@ -1,0 +1,33 @@
+{
+  "name": "spotify-discord-bot",
+  "version": "0.1.0",
+  "description": "Sends users Spotify now playing status to Discord channel",
+  "main": "index.js",
+  "repository": "github:skope/spotify-discord-bot",
+  "scripts": {
+    "test": "npm test"
+  },
+  "keywords": [
+    "discord",
+    "spotify",
+    "nowplaying"
+  ],
+  "author": "Sami Keinänen <skope@iki.fi>",
+  "license": "MIT",
+  "dependencies": {
+    "aws-sdk": "^2.167.0",
+    "bluebird": "^3.5.1",
+    "body-parser": "^1.18.2",
+    "discord.js": "^11.2.1",
+    "dotenv": "^4.0.0",
+    "express": "^4.16.2",
+    "lodash": "^4.17.4",
+    "moment": "^2.19.3",
+    "nunjucks": "^3.0.1",
+    "simple-oauth2": "^1.5.0",
+    "spotify-web-api-node": "^2.5.0",
+    "uuid": "^3.1.0",
+    "uws": "^9.14.0",
+    "winston": "^2.4.0"
+  }
+}
