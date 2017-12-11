@@ -89,7 +89,7 @@ class Bot {
           if (error.message === 'Token not found') {
             logger.error(`User ${username} is not authorized to use now playing command`);
 
-            return message.reply('You are not authorized to use this command. Please authorize the bot in https://dsb.psykedelia.org/');
+            return message.reply('You are not authorized to use this command. Please authorize the bot in https://sdb.psykedelia.org/');
           }
 
           logger.error('An error occurred while fetching now playing status', error);
