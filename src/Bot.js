@@ -33,7 +33,7 @@ class Bot {
    * Set bots username if it's not the same as specified in
    * DISCORD_USERNAME environment variable.
    *
-   * @return {Boolean|Promise}
+   * @return {Promise}
    */
   setUsername() {
     if (this.user.username !== process.env.DISCORD_USERNAME) {
@@ -54,8 +54,7 @@ class Bot {
    * a command message.
    *
    * @param  {Object}          message  Discord message object
-   * @return {Boolean|Promise}          False when nothing was did, method
-   *                                    according to command otherwise
+   * @return {Promise}
    */
   handleMessage(message) {
     const { author, content } = message;
@@ -65,14 +64,14 @@ class Bot {
      * infinite reply loops
      */
     if (author.bot === true) {
-      return false;
+      return Promise.resolve();
     }
 
     /*
      * Check if message is command message
      */
     if (content.startsWith('.') === false) {
-      return false;
+      return Promise.resolve();
     }
 
     /*

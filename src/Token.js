@@ -24,11 +24,22 @@ const oauth2 = require('simple-oauth2');
 
 class Token {
   constructor() {
+    /*
+     * OAuth2 table in DynamoDB
+     */
     this.tableName = 'discord-spotify-auth';
+
     this.docClient = new AWS.DynamoDB.DocumentClient();
     this.oauth2 = oauth2.create(credentials);
   }
 
+  /**
+   * Checks if token is expired and renews it
+   *
+   * @param  {String} token    Current token
+   * @param  {String} username Discord identifier of the related user
+   * @return {Promise}
+   */
   checkToken(token, username) {
     const accessToken = this.oauth2.accessToken.create(token);
 
@@ -42,6 +53,12 @@ class Token {
       .then(() => accessToken);
   }
 
+  /**
+   * Retrieves user token from the database
+   *
+   * @param  {String} username Discord identifier of the related user
+   * @return {Promise}         Resolves to token data
+   */
   getToken(username) {
     return new Promise((resolve, reject) => {
       const params = {
@@ -73,6 +90,13 @@ class Token {
     });
   }
 
+  /**
+   * Obtains new token from the OAuth2 server
+   *
+   * @param  {String} code     Authorization code from OAuth2
+   * @param  {String} username Discord identifier of the related user
+   * @return {Promise}
+   */
   getNewToken(code, username) {
     return this.oauth2
       .authorizationCode
@@ -82,6 +106,13 @@ class Token {
       });
   }
 
+  /**
+   * Adds new token to the database
+   *
+   * @param  {Object} tokenData Token object
+   * @param  {String} username  Discord identifier of the related user
+   * @return {Promise}
+   */
   putToken(tokenData, username) {
     return new Promise((resolve, reject) => {
       const token = this.oauth2.accessToken.create(tokenData).token;
@@ -106,6 +137,12 @@ class Token {
     });
   }
 
+  /**
+   * Deletes a token from the database
+   *
+   * @param  {String} username Discord identifier of the user
+   * @return {Promise}
+   */
   deleteToken(username) {
     return new Promise((resolve, reject) => {
       const params = {
@@ -125,6 +162,12 @@ class Token {
     });
   }
 
+  /**
+   * Creates authorization URI to OAuth2 server
+   *
+   * @param  {String} username Discord identifier of the related user
+   * @return {String}          Authorization URI
+   */
   createAuthorizationUri(username) {
     return this.oauth2.authorizationCode.authorizeURL({
       redirect_uri: process.env.OAUTH2_CALLBACK_URL,
