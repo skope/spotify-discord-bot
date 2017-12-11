@@ -2,6 +2,8 @@ const Promise = require('bluebird');
 const AWS = require('aws-sdk');
 const moment = require('moment');
 
+const logger = require('../logger');
+
 AWS.config.update({
   region: 'eu-central-1'
 });
@@ -55,7 +57,9 @@ class Token {
 
       this.docClient.query(params, (error, result) => {
         if (error) {
-          return reject(new Error('Error while connecting to the database', error));
+          logger.error('Error while connecting to the database', error);
+
+          return reject(new Error('Error while connecting to the database'));
         }
 
         if (result.Count === 0) {
@@ -92,6 +96,8 @@ class Token {
 
       this.docClient.put(params, (error, data) => {
         if (error) {
+          logger.error('An error occurred while putting token data to DynamoDB', error);
+
           return reject(error);
         }
 
@@ -109,7 +115,8 @@ class Token {
 
       this.docClient.delete(params, (error, data) => {
         if (error) {
-          console.log(error);
+          logger.error('An error occurred while deleting token data from DynamoDB', error);
+
           return reject(new Error(error));
         }
 
