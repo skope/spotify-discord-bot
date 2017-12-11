@@ -6,11 +6,11 @@ This bot will pick up currently playing track from Spotify API. Bot needs author
 
 ### Authorization
 
-- Go to [https://sdb.psykedelia.org/](https://sdb.psykedelia.org/)
-- Type in your Discord identifier
-- Click `Continue`
-- Accept the authorization in Spotify Authorization page
-- You are now authorized! Type in `.np` in the Discord channel the bot is in
+1. Go to [https://sdb.psykedelia.org/](https://sdb.psykedelia.org/)
+2. Type in your Discord identifier
+3. Click `Continue`
+4. Accept the authorization in Spotify Authorization page
+5. You are now authorized! Type in `.np` in the Discord channel the bot is in
 
 ### Authorization revocation
 
