@@ -41,16 +41,21 @@ class Token {
    * @return {Promise}
    */
   checkToken(token, username) {
+    const refreshToken = token.refresh_token;
     const accessToken = this.oauth2.accessToken.create(token);
 
     if (accessToken.expired() === false) {
-      return new Promise(resolve => resolve(token));
+      return new Promise.resolve(token);
     }
+
+    logger.info(`Refreshing access token for user ${username}`);
 
     return accessToken
       .refresh()
-      .then(result => this.putToken(result.token, username))
-      .then(() => accessToken);
+      .then(result => this.putToken(Object.assign(result.token, {
+        refresh_token: refreshToken
+      }), username))
+      .then(() => accessToken.token);
   }
 
   /**
