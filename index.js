@@ -72,7 +72,7 @@ app.delete('/', (req, res) => {
 
   token.deleteToken(username)
     .then(() => {
-      logger.info(`Token of username ${username} delete from the server`);
+      logger.info(`Token of username ${username} deleted from the server`);
 
       res.json({
         status: 'ok'
