@@ -1,14 +1,28 @@
 {
-  "apps" : [{
-    "name": "spotify-discord-bot",
-    "script": "./index.js",
-    "watch": true,
-    "ignore_watch": ["node_modules", "views"],
-    "env": {
-      "NODE_ENV": "development"
+  "apps" : [
+    {
+      "name": "web",
+      "script": "./index.js",
+      "watch": true,
+      "ignore_watch": ["node_modules", "views"],
+      "env": {
+        "NODE_ENV": "development"
+      },
+      "env_production" : {
+        "NODE_ENV": "production"
+      }
     },
-    "env_production" : {
-      "NODE_ENV": "production"
+    {
+      "name": "bot",
+      "script": "./bot.js",
+      "watch": true,
+      "ignore_watch": ["node_modules", "views"],
+      "env": {
+        "NODE_ENV": "development"
+      },
+      "env_production" : {
+        "NODE_ENV": "production"
+      }
     }
-  }]
+  ]
 }

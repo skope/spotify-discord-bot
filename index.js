@@ -8,14 +8,6 @@ const app = express();
 const logger = require('./logger');
 
 const Token = require('./src/Token');
-const Bot = require('./src/Bot');
-
-/*
- * Initialize Discord bot
- */
-const bot = new Bot(process.env.DISCORD_TOKEN);
-
-bot.start();
 
 app.use(bodyParser.urlencoded({
   extended: false
