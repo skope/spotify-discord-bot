@@ -112,13 +112,7 @@ class Bot {
       .then(data => token.checkToken(data, username))
       .then(data => spotifyApi.setAccessToken(data.access_token))
       .then(() => spotifyApi.getMyCurrentPlayingTrack())
-      .then(result => ({
-        artist: result.body.item.artists[0].name,
-        name: result.body.item.name,
-        album: result.body.item.album.name,
-        playing: result.body.is_playing
-      }))
-      .then(data => `${data.artist} - ${data.name} [${data.album}] ${!data.playing ? '(paused)' : ''}`);
+      .then(result => result.body.item.external_urls.spotify);
   }
 }
 
