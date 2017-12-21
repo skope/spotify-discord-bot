@@ -84,7 +84,7 @@ class Bot {
 
     if (command === 'np') {
       return this.nowPlaying(username)
-        .then(track => message.reply(track))
+        .then(track => message.channel.send(track))
         .catch(error => {
           if (error.message === 'Token not found') {
             logger.error(`User ${username} is not authorized to use now playing command`);
