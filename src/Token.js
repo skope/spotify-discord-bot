@@ -34,6 +34,16 @@ class Token {
   }
 
   /**
+   * Create OAuth2 access token from token data
+   *
+   * @param  {Object} token Token data
+   * @return {Object}
+   */
+  createToken(token) {
+    return this.oauth2.accessToken.create(token);
+  }
+
+  /**
    * Checks if token is expired and renews it
    *
    * @param  {String} token    Current token
@@ -42,7 +52,7 @@ class Token {
    */
   checkToken(token, username) {
     const refreshToken = token.refresh_token;
-    const accessToken = this.oauth2.accessToken.create(token);
+    const accessToken = this.createToken(token);
 
     if (accessToken.expired() === false) {
       return new Promise.resolve(token);
@@ -120,7 +130,7 @@ class Token {
    */
   putToken(tokenData, username) {
     return new Promise((resolve, reject) => {
-      const token = this.oauth2.accessToken.create(tokenData).token;
+      const token = this.createToken(tokenData).token;
 
       token['username'] = username;
       token['expires_at'] = moment(token.expires_at).format();
