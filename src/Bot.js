@@ -92,9 +92,13 @@ class Bot {
             return message.reply('You are not authorized to use this command. Please authorize the bot in https://sdb.psykedelia.org/');
           }
 
+          if (error.message === 'Bad Request') {
+            return message.reply('No data found from spotify.');
+          }
+
           logger.error('An error occurred while fetching now playing status', error);
 
-          message.reply('An error occurred while fetching status');
+          message.reply('An error occurred while fetching status.');
         });
     }
   }
