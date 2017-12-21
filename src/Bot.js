@@ -93,7 +93,7 @@ class Bot {
           }
 
           if (error.message === 'Bad Request') {
-            return message.reply('No data found from spotify.');
+            return message.reply('No data found from Spotify.');
           }
 
           logger.error('An error occurred while fetching now playing status', error);
